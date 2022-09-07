@@ -4,7 +4,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardButton, InlineKeyboardMarkup, InlineQueryResultArticle, InputTextMessageContent
 from pyrogram.handlers import MessageHandler
 from pyshorteners import Shortener
-
+DROPLINK_API = os.environ.get("DROPLINK_API", "b579ae1ed9f764939706b33e715244a7be80347e")
 BITLY_API = os.environ.get("BITLY_API", "8df1df8c23f719e5cf97788cc2d40321ea30092b")
 CUTTLY_API = os.environ.get("CUTTLY_API", "f64dffbde033b6c307387dd50b7c76e505f1c")
 SHORTCM_API = os.environ.get("SHORTCM_API", "pk_...NIZv")
@@ -52,6 +52,18 @@ async def inline_short(bot, update):
 
 async def short(link):
     shorten_urls = "**--Shorted URLs--**\n"
+
+    # Drop.link shorten
+    try:
+        
+        url = 'https://droplink.co/api'
+        params = {'api': DROPLINK_API, 'url': link}
+
+    async with aiohttp.ClientSession() as session:
+        async with session.get(url, params=params, raise_for_status=True) as response:
+            data = await response.json()
+            return data["shortenedUrl"]
+            shorten_urls += f"\n**Drop.link :-** {url}"
     
     # Bit.ly shorten
     if BITLY_API:
